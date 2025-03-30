@@ -1,0 +1,16 @@
+flowchart TD
+    A[Receive Chat Context and System Prompt] --> B[API Endpoint Receives Data]
+    B --> C[API Authentication]
+    C --> D[Stateless AI Agent Processing]
+    D --> E[Execute AI Model Query]
+    D --> F[Data Integration Modules]
+    F --> G[Web Searching and Web Scraping]
+    F --> H[External API Calls]
+    E --> I[Construct Response]
+    H --> I[Combine External Data]
+    I --> J[Integrate Scheduling]
+    J --> K[Google Calendar API]
+    I --> L[Error Handling and Fallback Mechanisms]
+    L --> I
+    I --> M[Send Response to Telegram Bot]
+    M --> N[Display in Telegram Group Chat]

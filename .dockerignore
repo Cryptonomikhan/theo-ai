@@ -1,0 +1,51 @@
+# Version control
+.git
+.gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+build/
+dist/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+logs/
+*.log
+
+# Google Calendar OAuth
+credentials.json
+token.json
+
+# Documentation
+documentation/
+README.md
+LICENSE
+
+# Test files
+tests/
+*.test.*
+
+# Other
+.DS_Store
+*.zip
+serverless.yml
+node_modules/ 

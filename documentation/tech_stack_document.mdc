@@ -1,0 +1,114 @@
+---
+description: Apply these rules when making changes to the project
+globs:
+alwaysApply: true
+---
+
+Update this rule if user requested changes to the project requirement, etc.
+# Theo-AI Tech Stack Document
+
+This document explains the technology choices behind Theo-AI, our AI-driven Telegram helper designed to streamline enterprise business development and research. We’ve built Theo-AI to be stateless and serverless, ensuring that each API call carries its own context and that Theo-AI remains efficient and scalable. Below is a detailed explanation of the technologies we’ve selected and how they contribute to the platform’s overall functionality.
+
+## Frontend Technologies
+
+Although Theo-AI is primarily accessed through messaging apps like Telegram rather than a traditional web or mobile interface, the system includes an application layer that handles user interactions within group chats. This component is critical to the user experience and includes the following:
+
+- **Telegram Bot Interface**
+  - Acts as the primary user interface within Telegram group chats.
+  - Handles reading chat messages and sending responses, making interactions seamless and natural.
+  - Maintains conversation context to ensure that responses from Theo-AI are accurate and relevant.
+
+The Telegram bot is designed to present a professional, courteous, and direct tone, aligning with the needs of business development professionals and ensuring that every interaction is meaningful and focused.
+
+## Backend Technologies
+
+The backbone of Theo-AI is composed of several core backend technologies that enable its advanced research and response functionalities:
+
+- **agno Framework**
+  - Serves as the foundation for the AI agent, enabling multi-agent functionalities and easy integration with external tools.
+  - Provides a structured approach for connecting different services and research tools critical to Theo-AI's operation.
+
+- **Serverless Architecture**
+  - Supports the stateless design of Theo-AI, allowing each API call to be independent and self-contained.
+  - Enhances scalability since the system does not rely on long-running server processes.
+
+- **OpenAI Compatible API**
+  - Ensures that Theo-AI can use various underlying AI models for processing and reasoning.
+  - Provides flexibility for future upgrades; initially, Theo-AI may start with a single model with the potential to support multiple models later.
+
+- **Web Scraping & Web Search Tools**
+  - Allow Theo-AI to gather detailed information from external websites, including company pages, Crunchbase, and LinkedIn.
+  - Enable real-time research that supports the business development activities triggered by Telegram interactions.
+
+## Infrastructure and Deployment
+
+To maintain a high level of reliability, scalability, and ease of deployment, we have made strategic infrastructure choices:
+
+- **Cloud-Based Serverless Hosting**
+  - Supports the serverless design by hosting our API endpoints in a cloud environment that scales automatically with demand.
+
+- **CI/CD Pipelines**
+  - Automated testing and deployment pipelines ensure code quality and facilitate rapid updates.
+  - This setup minimizes downtime and accelerates the delivery of new features and improvements.
+
+- **Version Control Systems (e.g., Git)**
+  - Used for source code management to coordinate team contributions and maintain a robust development history.
+
+These infrastructure components work together to provide a stable, efficient, and easily deployable solution for Theo-AI, ensuring that it can handle fluctuating demand and continuous improvements.
+
+## Third-Party Integrations
+
+Theo-AI leverages several external services to extend its functionality, making it a powerful tool for business development:
+
+- **Google Calendar Integration**
+  - Enables scheduling of calls and meetings directly through the bot.
+  - Plans for future integrations with tools such as cal.com and Calendly to offer even broader scheduling capabilities.
+
+- **External Data Sources**
+  - Integration with company websites, Crunchbase, and LinkedIn via web scraping and search tools to gather in-depth information about businesses and individuals.
+  - These integrations provide rich, actionable data that supports effective research, synergy identification, and proposal planning.
+
+- **API Authentication**
+  - Provides secure access control for calls to the Theo-AI endpoint and ensures that only authorized users can access premium integrations (if provided by users).
+
+## Security and Performance Considerations
+
+Security and performance are key aspects of the overall design of Theo-AI:
+
+- **API Authentication and Authorization**
+  - Robust authentication measures protect the API endpoints and external integrations against unauthorized access.
+  - Allows the possibility for users to supply specific API keys for extra functionality if needed.
+
+- **Stateless Design for Enhanced Performance**
+  - Theo-AI is built as a stateless agent, ensuring each call contains full context which minimizes dependency on persistent sessions.
+  - This design reduces server load and simplifies scalability, allowing each request to be processed quickly and independently.
+
+- **Efficient Data Management**
+  - The responsibility for maintaining conversation context and historical data is offloaded to application layers like the Telegram bot or separate databases (SQL or vector-based storage), allowing Theo-AI to focus on processing and research.
+  
+## Conclusion and Overall Tech Stack Summary
+
+To sum up, our technology choices for Theo-AI are tailored to creating a robust, efficient, and user-friendly AI assistant for business development professionals. Here’s a quick recap of our tech stack:
+
+- **Frontend**
+  - Telegram Bot Interface for seamless interaction.
+
+- **Backend**
+  - agno Framework to power multi-agent functionalities.
+  - Serverless Architecture for scalable, stateless processing.
+  - OpenAI Compatible API to integrate AI models and advanced research capabilities.
+  - Web Scraping and Web Search Tools for deep external research.
+
+- **Infrastructure & Deployment**
+  - Cloud-based hosting with automatic scaling.
+  - CI/CD pipelines for streamlined updates and high-quality code deployment.
+  - Version Control (e.g., Git) for reliable source code management.
+
+- **Third-Party Integrations**
+  - Google Calendar and planned integrations with cal.com/Calendly for scheduling.
+  - External data source access (company websites, Crunchbase, LinkedIn).
+  - Secure API Authentication for controlled access.
+
+The combination of these technologies positions Theo-AI as a state-of-the-art customer engagement and research tool, uniquely designed to reduce the business development cycle and unlock new opportunities for its users. Each component has been carefully selected not only for its individual capabilities but also for the way it contributes to a cohesive, scalable, and future-proof system.
+
+For any further questions or clarifications, feel free to reach out. This document serves as a clear guide to the tech stack behind Theo-AI and the rationale behind each choice, ensuring that even non-technical stakeholders can fully understand its design and benefits.

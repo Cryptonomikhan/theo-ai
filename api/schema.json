@@ -1,0 +1,250 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Theo-AI API",
+    "description": "API for Theo-AI, a Telegram Helper for Enterprise Ops",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/chat": {
+      "post": {
+        "summary": "Process chat messages",
+        "description": "Processes chat context and returns AI-generated response",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/schedule": {
+      "post": {
+        "summary": "Schedule a call",
+        "description": "Creates a calendar event for a scheduled call",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScheduleRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully scheduled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScheduleResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ChatRequest": {
+        "type": "object",
+        "required": ["chatContext", "systemPrompt"],
+        "properties": {
+          "chatContext": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "party": {
+                  "type": "string",
+                  "description": "The person or bot who sent the message"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "The content of the message"
+                }
+              }
+            },
+            "description": "Array of messages in the chat, formatted as party:message"
+          },
+          "systemPrompt": {
+            "type": "string",
+            "description": "System prompt with agent rules and reasoning steps"
+          },
+          "apiKeys": {
+            "type": "object",
+            "description": "Optional API keys for external integrations",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "modelId": {
+            "type": "string",
+            "description": "Optional ID of the AI model to use"
+          }
+        }
+      },
+      "ChatResponse": {
+        "type": "object",
+        "properties": {
+          "response": {
+            "type": "string",
+            "description": "AI-generated response to the chat context"
+          },
+          "researchData": {
+            "type": "object",
+            "description": "Optional data gathered from research"
+          },
+          "schedulingInfo": {
+            "type": "object",
+            "description": "Optional scheduling information if relevant"
+          }
+        }
+      },
+      "ScheduleRequest": {
+        "type": "object",
+        "required": ["summary", "attendees", "startTime", "endTime"],
+        "properties": {
+          "summary": {
+            "type": "string",
+            "description": "Title of the calendar event"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the calendar event"
+          },
+          "attendees": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Email addresses of attendees"
+          },
+          "startTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Start time of the event in ISO 8601 format"
+          },
+          "endTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "End time of the event in ISO 8601 format"
+          },
+          "timeZone": {
+            "type": "string",
+            "description": "Time zone for the event"
+          }
+        }
+      },
+      "ScheduleResponse": {
+        "type": "object",
+        "properties": {
+          "eventId": {
+            "type": "string",
+            "description": "ID of the created calendar event"
+          },
+          "eventLink": {
+            "type": "string",
+            "description": "Link to the calendar event"
+          },
+          "message": {
+            "type": "string",
+            "description": "Status message"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Error message"
+          },
+          "details": {
+            "type": "object",
+            "description": "Additional error details"
+          }
+        }
+      }
+    }
+  }
+} 

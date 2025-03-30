@@ -1,0 +1,123 @@
+---
+description: Apply these rules when making changes to the project
+globs:
+alwaysApply: true
+---
+
+Update this rule if user requested changes to the project requirement, etc.
+## Project Overview
+
+*   **Type:** Stateless/Serverless AI Agent Application
+*   **Description:** Theo-AI is a stateless/serverless AI agent built using the agno framework. It assists with business development research and partnership opportunities in Telegram group chats by gathering information about companies and individuals, identifying synergies, scheduling calls, and collaborating with other agents.
+*   **Primary Goal:** Create Theo-AI to provide contextually relevant business insights and integration with external tools (web scraping, calendar scheduling, API authentication) for startups and business development professionals.
+
+## Project Structure
+
+### Framework-Specific Routing
+
+*   **Directory Rules:**
+
+    *   **agno Framework v1.0:** Use a dedicated API directory for serverless functions. For instance, the API endpoint can be structured under `api/theo-ai/handler.js` to manage requests and enforce stateless design.
+    *   Example: "agno Framework v1.0" → `api/theo-ai/handler.js` to handle incoming API requests.
+
+### Core Directories
+
+*   **Versioned Structure:**
+
+    *   **api/**: Contains serverless function handlers, ensuring that each API endpoint (e.g., Telegram message ingestion, external data fetching) follows a stateless serverless architecture.
+    *   **services/**: Houses integration logic for external APIs such as Google Calendar, OpenAI Models, web scraping modules, and API authentication libraries.
+    *   **agents/**: Includes the core logic for the Theo-AI agent built using the agno framework, ensuring it remains stateless.
+    *   **utils/**: Provides helper functions for error handling, context management, and request validation.
+
+### Key Files
+
+*   **Stack-Versioned Patterns:**
+
+    *   **api/theo-ai/handler.js:** Implements the serverless API endpoint for handling Telegram chat messages and system prompts.
+    *   **agents/theo-ai/core.js:** Contains the core logic of the stateless AI agent built on the agno framework.
+    *   **services/calendar.js:** Integrates the Google Calendar API for scheduling events.
+    *   **services/scraper.js:** Manages data retrieval from web scraping and API calls.
+
+## Tech Stack Rules
+
+*   **Version Enforcement:**
+
+    *   **agno@v1.0:** Enforce the use of a stateless, serverless design. No persistent state should be maintained within the core agent. All context must be passed to and from endpoints as needed.
+    *   **API Authentication Libraries:** Must meet the latest security standards for handling authentication with every endpoint.
+    *   **Google Calendar API:** Initial integration should follow OAuth2 protocols, with provisions for future expansion to cal.com and Calendly.
+
+## PRD Compliance
+
+*   **Non-Negotiable:**
+
+    *   "The core agent must remain stateless." : The design and implementation of Theo-AI should not involve any server-side stored context within the core agent; all state management should be handled externally.
+
+## App Flow Integration
+
+*   **Stack-Aligned Flow:**
+
+    *   Example: Theo-AI API Endpoint → `api/theo-ai/handler.js` ingests Telegram group chat messages, processes context using the agno framework, integrates external data sources (web scraping, Google Calendar), and responds using a stateless serverless function model.
+
+## Best Practices
+
+*   **agno Framework**
+
+    *   Enforce a pure stateless design by passing all necessary context with each request.
+    *   Implement robust error handling to manage invalid data, connectivity issues, and permission errors gracefully.
+    *   Maintain a separation of concerns where integration logic is isolated from the core AI agent logic.
+
+*   **Telegram Bot**
+
+    *   Use webhooks or polling effectively for real-time data ingestion from group chats.
+    *   Ensure message parsing maintains the integrity of the chat context ("party: message" format).
+    *   Secure message delivery and reduce potential spam by validating incoming messages.
+
+*   **Serverless Architecture**
+
+    *   Leverage auto-scaling to handle fluctuating message traffic efficiently.
+    *   Minimize cold start times by optimizing function deployment and dependencies.
+    *   Monitor and log function executions for robust error detection and performance tuning.
+
+*   **OpenAI Compatible API**
+
+    *   Implement strict rate limiting and error handling to safeguard against API overuse.
+    *   Validate prompts and responses to ensure consistency with Theo-AI's professional tone and scope.
+    *   Prepare for multi-model support by abstracting AI model calls within a dedicated service layer.
+
+*   **Web Scraping & Web Search Tools**
+
+    *   Respect robots.txt and ensure compliance with data source policies.
+    *   Include fallback mechanisms in case data sources become unavailable.
+    *   Regularly update scraping logic to adapt to website changes.
+
+*   **Google Calendar API**
+
+    *   Use OAuth2 for secure and compliant access.
+    *   Validate scheduling requests to prevent conflicts and ensure proper time zone handling.
+    *   Log calendar interactions for auditing and troubleshooting.
+
+*   **API Authentication Libraries**
+
+    *   Enforce strict authentication and authorization standards across all endpoints.
+    *   Keep dependencies updated to incorporate the latest security patches.
+    *   Regularly audit endpoint access and permissions.
+
+*   **Cursor IDE**
+
+    *   Utilize the IDE’s AI-powered coding capabilities to maintain code quality and consistency.
+    *   Integrate with version control systems for efficient collaboration.
+    *   Ensure robust testing and code review procedures are in place.
+
+*   **3rd Party Databases (SQL/Vector)**
+
+    *   Plan for encrypted storage and secure access protocols when implementing long term memory.
+    *   Design the database schema with scalability in mind.
+    *   Consider using managed database services to reduce operational overhead.
+
+## Rules
+
+*   Derive folder/file patterns directly from techStackDoc versions to ensure consistency across the project.
+*   If using a serverless model with agno Framework, enforce a clear separation between API endpoints (e.g., `api/`) and internal services (`services/`, `agents/`).
+*   Never mix version patterns; if the project is built with agno Framework v1.0, do not integrate patterns from frameworks requiring persistent state or different routing structures.
+*   Maintain strict compliance with the PRD requirement: the core agent must remain stateless at all times.
+*   Ensure that directory structures, file patterns, and integration points reflect a modular and maintainable architecture tailored for rapid scalability and secure deployment.

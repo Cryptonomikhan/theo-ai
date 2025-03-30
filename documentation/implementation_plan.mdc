@@ -1,0 +1,76 @@
+---
+description: Apply these rules when making changes to the project
+globs:
+alwaysApply: true
+---
+
+Update this rule if user requested changes to the project requirement, etc.
+# Implementation plan
+
+## Phase 1: Environment Setup
+
+1. **Prevalidation:** Check if the current directory is already a project by verifying the existence of a configuration file (e.g., check for a key file like `package.json` or an Agno config file). (Reference: General best practices)
+2. **Install Required Tools:** Ensure the Agno framework and other required CLI tools are installed. (Reference: Tech Stack – Agno Framework)
+3. **Set Up Serverless Environment:** Since Theo-AI is serverless, initialize the serverless project structure. Create a project root folder (if not existing) and set up configuration files (e.g., `serverless.yml`). (Reference: Project Overview and Tech Stack – Serverless Architecture)
+4. **Configure API Credentials & Keys Storage:** Create a secure location (e.g., environment variables file `.env`) to store API keys for external services (Google Calendar, Crunchbase, etc.) with appropriate access restrictions. (Reference: Authentication & Security)
+
+## Phase 2: API Design and Telegram Bot Integration
+
+5. **Design API Request/Response Structure:** Define the API endpoint to process chat context. Document the request payload (e.g., `{ "party": "<message>", "systemPrompt": "<prompt>", "apiKeys": { ... } }`). Create a file `/api/schema.json` to document this structure. (Reference: API Design)
+6. **Implement API Endpoint:** Create a new file (e.g. `/api/index.js` or `/api/main.py` depending on language choice) that listens for incoming HTTP requests containing chat context and system prompts and forwards them to the agent logic. (Reference: API Design)
+7. **Validation:** Test the API endpoint by sending a sample payload with a tool like Postman or curl and verifying the response structure.
+8. **Telegram Bot Setup:** Create a Telegram bot using BotFather and acquire the API token. Add the token to your secure environment variables file. (Reference: Telegram Integration)
+9. **Telegram Bot Listener:** Implement the bot’s core logic in a file (e.g., `/telegram/bot.js`). The bot should listen to messages from group chats and extract the chat context. Validate incoming messages are in the expected format. (Reference: Telegram Integration)
+10. **Forwarding Chat Context:** Within the Telegram bot logic, add functionality to call the API endpoint (created in Step 6) with the extracted chat context and system prompt. (Reference: API Design & Telegram Integration)
+
+## Phase 3: Agno Agent and Business Logic Development
+
+11. **Initialize Agno Agent:** Create a new agent module using the Agno framework. Create a file `/agents/theoAgent.js` that sets up the multi-agent capabilities. (Reference: Agno Framework Integration)
+12. **Configure Tools in Agno Agent:** Integrate web search, web scraping, and direct API call capabilities in the agent. Configure these tools within the agent structure per the Agno framework guidelines. (Reference: Agno Agent Implementation)
+13. **Integrate AI Model Selection:** In `/agents/theoAgent.js`, add a mechanism to select an AI model. Initially allow a single selectable model, but design the code to support future multiple AI models using an OpenAI-compatible API. (Reference: AI Model Selection)
+14. **Implement Business Logic:** Within the agent module, implement core logic to:
+    - Parse incoming chat messages
+    - Conduct research on mentioned companies/individuals using integrated web tools
+    - Identify potential business synergies
+    - Invoke scheduling functionalities (Google Calendar) for call scheduling
+   (Reference: Core Functionality and Scheduling Integration)
+15. **Validation:** Write unit tests for the agent logic in a test file (e.g., `/agents/tests/theoAgent.test.js`) and run them to verify correct behaviours.
+
+## Phase 4: Scheduling and Authentication Integration
+
+16. **Google Calendar API Integration:** Create a dedicated module (e.g., `/integrations/googleCalendar.js`) to handle Google Calendar operations. Start with scheduling calls by integrating Google Calendar’s API. (Reference: Scheduling Integration)
+17. **Authentication Implementation:** Add authentication middleware for the API endpoint to secure key access. If using Node.js, consider using packages like `jsonwebtoken`. Protect endpoints so that only authorized requests with valid API tokens can trigger agent functionality. (Reference: Authentication & Security)
+18. **Secure API Keys Handling:** Ensure that any provided external API keys are validated and stored securely (use serverless secrets management or a secure encrypted environment store). (Reference: Authentication & Security)
+19. **Validation:** Test the Google Calendar scheduling module with sample API calls and verify the scheduled event creation with Google Calendar’s test environment.
+
+## Phase 5: Integration and Error Handling
+
+20. **Integrate Components:** Connect the Telegram bot, API, and Agno agent modules. Ensure the Telegram bot forwards messages to the API endpoint which in turn triggers the Agno agent. (Reference: Integration – App Flow)
+21. **Error Handling:** Implement error handling in both the API endpoint and the agent module to capture and log exceptions (e.g., external API call failures, malformed messages). Use try/catch blocks and log errors to a file (e.g., `/logs/error.log`). (Reference: Error Handling)
+22. **Validation:** Simulate error conditions (e.g., missing API keys or failing external API) to verify that errors are caught and logged appropriately.
+
+## Phase 6: Deployment
+
+23. **Prepare Deployment Configuration:** Create a deployment configuration file (e.g., `serverless.yml`) that defines the service, runtime (e.g., Node.js if applicable), and corresponding API gateway settings. (Reference: Deployment)
+24. **Deploy to Cloud Provider:** Use your chosen serverless provider (AWS Lambda, Google Cloud Functions, etc.) to deploy the API and agent. Include region and account ID in the configuration if applicable. (Reference: Deployment – Tech Stack)
+25. **Validate Deployment:** Run integration tests by sending sample chat messages through the Telegram bot and verifying that responses are generated correctly and tasks (such as scheduling calls) are executed.
+
+## Future Enhancements and Considerations
+
+26. **Plan Multi-Model Support:** Refactor the agent code in `/agents/theoAgent.js` to be modular so that additional AI models can be integrated seamlessly later. (Reference: Future Enhancements)
+27. **Consider Long-Term Memory Options:** Document possible integrations for state storage, such as a SQL or vector database, to store long-term context if required in future iterations. (Reference: State Management Strategy)
+28. **Collaboration with Other Agents:** Outline a future module design to allow collaboration between Theo-AI and other agents for tasks like proposal deck generation. Create a design doc file (`/docs/future/collaboration.md`). (Reference: Future Enhancements)
+
+## Testing and Verification
+
+29. **System Integration Testing:** Write end-to-end tests that simulate full chat flows from Telegram bot message receipt to agent processing and external API interactions. (Reference: Quality Assurance)
+30. **Security Testing:** Validate that authentication holds and unauthorized requests are blocked. (Reference: Authentication & Security)
+31. **User Acceptance Testing:** Prepare a test plan for beta users (e.g., business development professionals on Telegram) and document their feedback for continuous improvement. (Reference: Target Audience and Future Enhancements)
+
+## Final Notes
+
+- Ensure that every coding step, from environment setup to deployment, is validated with appropriate tests and logs.
+- Use configuration files (e.g., `.env`, `serverless.yml`, and custom JSON config files) to maintain environment-specific parameters.
+- Keep documentation updated for each integration (API, Telegram Bot, Agno agent, Google Calendar) to aid future enhancements.
+
+This implementation plan gives a modular and testable step-by-step process to build Theo-AI, a stateless/serverless AI agent for business development tasks in Telegram group chats.
