@@ -10,14 +10,15 @@ Theo-AI is a stateless, serverless AI agent built using the agno framework. It's
 - **Scheduling Integration**: Connects with Google Calendar to schedule calls and meetings.
 - **Enterprise-focused**: Specifically designed for business development professionals and startups.
 - **Model Flexibility**: Uses Formation Cloud by default for intelligent model routing with "best-x" selection, but also supports OpenAI models.
+- **Agno Framework Integration**: Leverages agno's TelegramTools and GoogleCalendarTools for efficient and scalable functionality.
 
 ## Tech Stack
 
 - **agno Framework**: Powers the core AI agent with multi-agent capabilities.
 - **Python**: Backend implementation language.
 - **Formation Cloud**: Primary AI model provider with intelligent routing.
-- **Telegram Bot API**: For chat integration.
-- **Google Calendar API**: For scheduling functionality.
+- **Telegram Bot API**: For chat integration via agno's TelegramTools.
+- **Google Calendar API**: For scheduling functionality via agno's GoogleCalendarTools.
 - **OpenAI Compatible API**: For alternative AI model access.
 
 ## Project Structure
@@ -48,9 +49,10 @@ theo-ai/
 6. Set up Google Calendar (optional):
    - Follow the instructions at [https://docs.agno.com/tools/toolkits/googlecalendar](https://docs.agno.com/tools/toolkits/googlecalendar) to set up Google Calendar API access
    - Download the credentials.json file to the project root
+   - Set the `GOOGLE_CALENDAR_CREDENTIALS_PATH` in your `.env` file (defaults to "credentials.json")
 7. Set up your Telegram bot:
    - Create a new bot with BotFather on Telegram
-   - Get the token and add it to your `.env` file
+   - Get the token and add it to your `.env` file as `TELEGRAM_BOT_TOKEN`
    - To get your chat ID, send a message to your bot and visit: `https://api.telegram.org/bot<your-token>/getUpdates`
 8. Run the API server: `python run_local.py`
 9. Start the Telegram bot: `python run_telegram_bot.py`
@@ -106,6 +108,41 @@ Optional environment variables:
 - `GOOGLE_CALENDAR_CLIENT_ID`: Google Calendar OAuth client ID
 - `GOOGLE_CALENDAR_CLIENT_SECRET`: Google Calendar OAuth client secret
 - `GOOGLE_CALENDAR_REDIRECT_URI`: Redirect URI for Google Calendar OAuth
+- `GOOGLE_CALENDAR_CREDENTIALS_PATH`: Path to Google Calendar credentials JSON file (default: "credentials.json")
+
+## Agno Framework Integration
+
+Theo-AI leverages the agno framework's tools and functionality for optimal performance:
+
+### TelegramTools
+
+The agent uses agno's TelegramTools for direct integration with Telegram, allowing it to:
+- Send messages directly to Telegram chats
+- Interact seamlessly with the chat context
+- Maintain a professional and responsive presence in group conversations
+
+```python
+# Example of TelegramTools integration in the agent
+tools.append(TelegramTools(
+    token=TELEGRAM_BOT_TOKEN,
+    chat_id=chat_id
+))
+```
+
+### GoogleCalendarTools
+
+The agent uses agno's GoogleCalendarTools for efficient calendar operations:
+- Create and manage calendar events
+- Schedule calls and meetings
+- Handle OAuth authentication automatically
+
+```python
+# Example of GoogleCalendarTools integration in the agent
+tools.append(GoogleCalendarTools(
+    credentials_path=GOOGLE_CALENDAR_CREDENTIALS_PATH,
+    token_path="./token.json"
+))
+```
 
 ## Deployment
 
@@ -131,6 +168,15 @@ Theo-AI is deployed on [Formation Cloud](https://formation.cloud), a vertically 
 ### Running in Production
 
 In production, the Telegram bot component should be run as a separate process that communicates with the API endpoint. Update the `API_ENDPOINT` variable in `telegram/bot.py` to point to your Formation Cloud endpoint before deploying the bot.
+
+## Future Improvements
+
+Future plans for Theo-AI include:
+1. Implementing specialized agents for different tasks (research, scheduling, synthesis)
+2. Using agno's Team functionality for better coordination between specialized agents
+3. Adding more tools for enhanced business development capabilities
+
+Check the `.cursor/implementation_plan.md` file for detailed future improvement plans.
 
 ## License
 

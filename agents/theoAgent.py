@@ -7,6 +7,7 @@ to assist with business development tasks.
 """
 from typing import List, Dict, Any, Optional
 import os
+import logging
 
 from agno.agent import Agent
 from agno.models.openai import OpenAIChat
@@ -22,7 +23,8 @@ from utils.config import (
     TELEGRAM_BOT_TOKEN, 
     DEFAULT_MODEL_PROVIDER,
     DEFAULT_MODEL_ID,
-    FORMATION_API_BASE_URL
+    FORMATION_API_BASE_URL,
+    GOOGLE_CALENDAR_CREDENTIALS_PATH
 )
 from utils.logging_utils import setup_logger
 
@@ -84,13 +86,30 @@ class TheoAgent:
                 WebBrowserTools(),   # Web browser/scraping
             ]
             
-            # Add Google Calendar Tools if credentials file exists
-            if os.path.exists('credentials.json'):
-                tools.append(GoogleCalendarTools(credentials_path="credentials.json"))
+            # Add Google Calendar Tools using Agno's native implementation
+            # Only if credentials path is configured or exists in the default location
+            credentials_path = GOOGLE_CALENDAR_CREDENTIALS_PATH
+            if credentials_path and os.path.exists(credentials_path):
+                try:
+                    tools.append(GoogleCalendarTools(
+                        credentials_path=credentials_path,
+                        # Store token in a specific location for better tracking
+                        token_path="./token.json"
+                    ))
+                    logger.info("Google Calendar Tools added to agent")
+                except Exception as e:
+                    logger.error(f"Failed to initialize Google Calendar Tools: {str(e)}")
             
             # Add Telegram Tools if chat_id is provided
             if chat_id and TELEGRAM_BOT_TOKEN:
-                tools.append(TelegramTools(token=TELEGRAM_BOT_TOKEN, chat_id=chat_id))
+                try:
+                    tools.append(TelegramTools(
+                        token=TELEGRAM_BOT_TOKEN,
+                        chat_id=chat_id
+                    ))
+                    logger.info(f"Telegram Tools added for chat ID: {chat_id}")
+                except Exception as e:
+                    logger.error(f"Failed to initialize Telegram Tools: {str(e)}")
             
             # Create agent with the specified model
             self.agent = Agent(
@@ -112,6 +131,7 @@ class TheoAgent:
                     - Potential synergies and partnership opportunities
                     
                     If calendar scheduling is mentioned, help schedule calls using the Google Calendar integration.
+                    When sending messages to the Telegram chat, use the Telegram tools directly.
                     """
                 ]
             )

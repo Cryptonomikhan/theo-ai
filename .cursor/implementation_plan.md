@@ -13,7 +13,7 @@
 6. **Implement API Endpoint:** Create a new file (e.g. `/api/index.js` or `/api/main.py` depending on language choice) that listens for incoming HTTP requests containing chat context and system prompts and forwards them to the agent logic. (Reference: API Design)
 7. **Validation:** Test the API endpoint by sending a sample payload with a tool like Postman or curl and verifying the response structure.
 8. **Telegram Bot Setup:** Create a Telegram bot using BotFather and acquire the API token. Add the token to your secure environment variables file. (Reference: Telegram Integration)
-9. **Telegram Bot Listener:** Implement the bot’s core logic in a file (e.g., `/telegram/bot.js`). The bot should listen to messages from group chats and extract the chat context. Validate incoming messages are in the expected format. (Reference: Telegram Integration)
+9. **Telegram Bot Listener:** Implement the bot's core logic in a file (e.g., `/telegram/bot.js`). The bot should listen to messages from group chats and extract the chat context. Validate incoming messages are in the expected format. (Reference: Telegram Integration)
 10. **Forwarding Chat Context:** Within the Telegram bot logic, add functionality to call the API endpoint (created in Step 6) with the extracted chat context and system prompt. (Reference: API Design & Telegram Integration)
 
 ## Phase 3: Agno Agent and Business Logic Development
@@ -31,10 +31,10 @@
 
 ## Phase 4: Scheduling and Authentication Integration
 
-16. **Google Calendar API Integration:** Create a dedicated module (e.g., `/integrations/googleCalendar.js`) to handle Google Calendar operations. Start with scheduling calls by integrating Google Calendar’s API. (Reference: Scheduling Integration)
+16. **Google Calendar API Integration:** Create a dedicated module (e.g., `/integrations/googleCalendar.js`) to handle Google Calendar operations. Start with scheduling calls by integrating Google Calendar's API. (Reference: Scheduling Integration)
 17. **Authentication Implementation:** Add authentication middleware for the API endpoint to secure key access. If using Node.js, consider using packages like `jsonwebtoken`. Protect endpoints so that only authorized requests with valid API tokens can trigger agent functionality. (Reference: Authentication & Security)
 18. **Secure API Keys Handling:** Ensure that any provided external API keys are validated and stored securely (use serverless secrets management or a secure encrypted environment store). (Reference: Authentication & Security)
-19. **Validation:** Test the Google Calendar scheduling module with sample API calls and verify the scheduled event creation with Google Calendar’s test environment.
+19. **Validation:** Test the Google Calendar scheduling module with sample API calls and verify the scheduled event creation with Google Calendar's test environment.
 
 ## Phase 5: Integration and Error Handling
 
@@ -53,6 +53,55 @@
 26. **Plan Multi-Model Support:** Refactor the agent code in `/agents/theoAgent.js` to be modular so that additional AI models can be integrated seamlessly later. (Reference: Future Enhancements)
 27. **Consider Long-Term Memory Options:** Document possible integrations for state storage, such as a SQL or vector database, to store long-term context if required in future iterations. (Reference: State Management Strategy)
 28. **Collaboration with Other Agents:** Outline a future module design to allow collaboration between Theo-AI and other agents for tasks like proposal deck generation. Create a design doc file (`/docs/future/collaboration.md`). (Reference: Future Enhancements)
+
+## Future Improvements
+
+### Multi-Agent Architecture
+3. **Implement Specialized Agents:** Develop multiple specialized agents, each with a focused responsibility:
+   - **Research Agent:** Dedicated to gathering information about companies and individuals using web search and web scraping tools.
+   - **Calendar Agent:** Focused on managing scheduling and calendar operations.
+   - **Synthesis Agent:** Responsible for analyzing gathered information and identifying business synergies.
+   
+   This approach will result in better performance as each agent can be optimized for its specific task rather than loading a single agent with multiple responsibilities.
+
+4. **Implement Team Coordination with Agno's Team Functionality:** 
+   ```python
+   from agno.team import Team
+   
+   # Create specialized agents
+   research_agent = Agent(
+       name="Research Agent",
+       role="Search the web for company and individual information",
+       model=FormationChat(id="best-quality"),
+       tools=[DuckDuckGoTools(), WebBrowserTools()],
+       instructions=["Always include sources"],
+       show_tool_calls=True,
+       markdown=True,
+   )
+   
+   calendar_agent = Agent(
+       name="Calendar Agent",
+       role="Manage scheduling and calendar operations",
+       model=FormationChat(id="best-speed"),
+       tools=[GoogleCalendarTools(credentials_path=GOOGLE_CALENDAR_CREDENTIALS_PATH)],
+       instructions=["Always confirm scheduled events"],
+       show_tool_calls=True,
+       markdown=True,
+   )
+   
+   # Coordinate the team
+   agent_team = Team(
+       mode="coordinate",
+       members=[research_agent, calendar_agent],
+       model=FormationChat(id="best-reasoning"),
+       success_criteria="A comprehensive business intelligence report with clear actions and scheduling options.",
+       instructions=["Always include sources", "Suggest next steps"],
+       show_tool_calls=True,
+       markdown=True,
+   )
+   ```
+   
+   This multi-agent approach will allow for more efficient task distribution and specialized processing, leading to better overall performance and user experience.
 
 ## Testing and Verification
 
