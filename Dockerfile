@@ -32,4 +32,4 @@ USER theo
 EXPOSE 8000
 
 # Default command (can be overridden in docker-compose.yml)
-CMD ["python", "run_local.py"] 
+CMD ["python", "run_theo_bot.py"] 

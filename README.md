@@ -80,15 +80,18 @@ This design allows multiple bot instances (frontends) to share a single scalable
    - Windows: `venv\Scripts\activate`
    - Unix/MacOS: `source venv/bin/activate`
 4. Install dependencies: `pip install -r requirements.txt`
-5. Copy `.env.example` to `.env` and add your API keys (see [Environment Variables](#environment-variables))
-6. Set up your Telegram bot (see [Detailed Setup Guide](#detailed-setup-guide))
-7. Run the API server: `python run_local.py`
-8. Start the Telegram bot: `python run_telegram_bot.py`
+5. Copy `.env.example` to `.env` and configure:
+   - Generate a secure `API_SECRET_KEY`: `openssl rand -hex 32` (or any secure random string generator)
+   - Add your chosen AI model provider key (`FORMATION_API_KEY` or `OPENAI_API_KEY`)
+   - Add your `TELEGRAM_BOT_TOKEN` (see [Telegram Bot Setup](#detailed-setup-guide))
+   - Configure other optional settings as needed
+6. Run the API server: `python run_local.py`
+7. Start the Telegram bot: `python run_telegram_bot.py`
 
 ### Quick Start (Docker)
 
 1. Clone this repository
-2. Copy `.env.example` to `.env` and configure your environment variables
+2. Copy `.env.example` to `.env` and configure as described above
 3. Build and run with Docker Compose:
    ```bash
    docker-compose up --build
@@ -168,7 +171,12 @@ For detailed setup instructions, including Telegram bot creation and configurati
 Each instance of the Telegram bot needs access to the user's specific AI provider API key (Formation or OpenAI) to authenticate requests sent to the central Theo-AI API.
 
 1.  **Configure User API Key**: Ensure that *your* `FORMATION_API_KEY` or `OPENAI_API_KEY` is correctly set in the `.env` file for the bot instance you are running.
-2.  **Start Services**:
+2.  **Configure API Authentication**: The `API_SECRET_KEY` is used to authenticate communication between the Telegram bot and the Theo-AI API:
+    - This key must be identical in both components
+    - For self-hosted deployments, you control this key yourself
+    - For production setups, use a strong random key (e.g., `openssl rand -hex 32`)
+    - Never share this key publicly
+3.  **Start Services**:
     *   **Local**: Run `python run_local.py` (for the central API) in one terminal and `python run_telegram_bot.py` in another.
     *   **Docker**: Run `docker-compose up --build`. Docker Compose will manage both the API and bot services.
 
@@ -275,7 +283,7 @@ Each instance of the Telegram bot needs access to the user's specific AI provide
    - Application type: "Web application"
    - Name: "Theo AI Calendar Integration"
    - Authorized redirect URIs:
-     - For local testing: `http://localhost:8000/google/oauth2callback`
+     - For local testing: `2`
      - For production: Add your production callback URL
    - Click "Create"
    - A popup will display your Client ID and Client Secret - click "Download JSON"
@@ -350,11 +358,18 @@ Common issues and solutions:
    - Check if API server is running
    - Verify `API_ENDPOINT` is correct
    - Check network connectivity
+   - Ensure the `API_SECRET_KEY` is identical in both the API server and Telegram bot `.env` files
+   - Look for 401 errors in logs which might indicate mismatched API keys
 
 3. **Calendar Integration Issues**
    - Verify OAuth credentials
    - Check if `credentials.json` is properly formatted
    - Ensure required scopes are enabled
+
+4. **Model Provider Authentication Errors**
+   - Verify your `FORMATION_API_KEY` or `OPENAI_API_KEY` is valid and not expired
+   - Check for rate limiting or usage quota issues with your AI model provider
+   - Ensure the key has proper permissions for the models you're trying to use
 
 For more troubleshooting help, check the logs in the `logs/` directory.
 
@@ -398,8 +413,8 @@ You can change the model provider and model using the `/model` command in the Te
 ## Environment Variables
 
 Required environment variables:
-- `API_SECRET_KEY`: Secret key for API authentication
-- `TELEGRAM_BOT_TOKEN`: Your Telegram bot token
+- `API_SECRET_KEY`: Secret key for authenticating requests to the Theo-AI API endpoint. Generate a strong random string (e.g. `openssl rand -hex 32`) and use the same value for both the API server and Telegram bot components.
+- `TELEGRAM_BOT_TOKEN`: Your Telegram bot token from BotFather
 - Either `FORMATION_API_KEY` or `OPENAI_API_KEY` depending on your chosen model provider
 
 Optional environment variables:

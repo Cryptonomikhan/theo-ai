@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 Theo-AI Telegram Bot
 
@@ -9,8 +10,9 @@ import os
 import json
 from typing import List, Dict, Any, Optional
 import asyncio
-import httpx
+from dotenv import load_dotenv
 
+# Import from the python-telegram-bot package
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     Application,
@@ -21,19 +23,21 @@ from telegram.ext import (
     filters,
 )
 
+# Import project-specific modules
 from utils.config import (
     TELEGRAM_BOT_TOKEN, 
     API_SECRET_KEY, 
     DEFAULT_MODEL_PROVIDER,
     DEFAULT_MODEL_ID,
-    FORMATION_API_KEY,  # Import Formation key
-    OPENAI_API_KEY      # Import OpenAI key
+    FORMATION_API_KEY,
+    OPENAI_API_KEY
 )
 from utils.logging_utils import setup_logger
 from utils.system_prompts import DEFAULT_SYSTEM_PROMPT
+import httpx
 
 # Configure logging
-logger = setup_logger("telegram_bot", "telegram_bot.log")
+logger = setup_logger("theo_telegram", "theo_telegram.log")
 
 # Define global variables
 MAX_CONTEXT_LENGTH = 10  # Max number of messages to include in context
@@ -243,6 +247,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 async def process_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """
     Process incoming chat messages, enrich with context, and forward to the AI backend.
+    As per implementation plan steps 9 & 10: extracts chat context and forwards to API.
     """
     # Ignore messages that are not from a group chat or private chat
     if update.effective_chat.type not in ['group', 'supergroup', 'private']:
@@ -264,11 +269,10 @@ async def process_message(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     if chat_id not in chat_contexts:
         chat_contexts[chat_id] = []
 
-    # Add current message to context
+    # Add current message to context using the format expected by our API
     chat_contexts[chat_id].append({
-        "role": "user" if user else "assistant", # Simple role assignment
-        "name": user.username or str(user.id) if user else "bot",
-        "content": message_text
+        "party": user.username or str(user.id) if user else "bot",
+        "message": message_text
     })
 
     # Trim context if it exceeds max length
@@ -280,7 +284,7 @@ async def process_message(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     model_provider = settings.get("model_provider", DEFAULT_MODEL_PROVIDER)
     model_id = settings.get("model_id", DEFAULT_MODEL_ID)
     
-    # --- Get User-Specific API Key ---
+    # Get User-Specific API Key
     user_api_key = None
     if model_provider == 'formation' and FORMATION_API_KEY:
         user_api_key = FORMATION_API_KEY
@@ -290,18 +294,15 @@ async def process_message(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         logger.debug(f"Using OpenAI API Key for chat {chat_id}")
     else:
         logger.warning(f"No API key found for provider '{model_provider}' in chat {chat_id}. Request might fail.")
-    # --- End Get User-Specific API Key ---
 
     # Prepare payload for the central API
+    # As per implementation plan step 5, we use "chatContext" format
     payload = {
-        "chat_id": chat_id,
-        "messages": chat_contexts[chat_id],
-        "system_prompt": DEFAULT_SYSTEM_PROMPT, # TODO: Allow customizing this per chat?
-        "model_config": {
-            "provider": model_provider,
-            "model_id": model_id
-        }
-        # Note: The central API needs to handle tool usage based on context
+        "chatContext": chat_contexts[chat_id],
+        "systemPrompt": DEFAULT_SYSTEM_PROMPT,
+        "modelProvider": model_provider,
+        "modelId": model_id,
+        "chatId": chat_id
     }
 
     # Prepare headers
@@ -310,14 +311,14 @@ async def process_message(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         "X-API-Key": API_SECRET_KEY # Secret for the central API itself
     }
     
-    # --- Add User-Specific Key to Header ---
+    # Add User-Specific Key to Header
     if user_api_key:
         headers["X-User-API-Key"] = user_api_key
-    # --- End Add User-Specific Key to Header ---
 
     # Send request to the central API endpoint
     try:
         async with httpx.AsyncClient() as client:
+            logger.info(f"Sending request to API: {API_ENDPOINT}")
             response = await client.post(
                 API_ENDPOINT,
                 json=payload,
@@ -333,9 +334,8 @@ async def process_message(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
                 logger.info(f"Received AI response for chat {chat_id}: {ai_response_content[:100]}...")
                 # Add AI response to context
                 chat_contexts[chat_id].append({
-                    "role": "assistant",
-                    "name": "theo-ai",
-                    "content": ai_response_content
+                    "party": "Theo-AI",
+                    "message": ai_response_content
                 })
                 # Send AI response back to Telegram chat
                 await update.message.reply_text(ai_response_content)
@@ -365,6 +365,8 @@ def main() -> None:
     if not FORMATION_API_KEY and not OPENAI_API_KEY:
         logger.warning("Neither FORMATION_API_KEY nor OPENAI_API_KEY is set. AI requests may fail.")
 
+    # Create the application and pass it the token
+    # Using the Application class as recommended in the python-telegram-bot docs
     application = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
 
     # Register command handlers

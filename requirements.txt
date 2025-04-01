@@ -1,5 +1,5 @@
 agno>=1.2.6
-python-telegram-bot>=22.0
+python-telegram-bot[ext]>=22.0
 google-auth>=2.38.0
 google-auth-oauthlib>=1.2.1
 google-auth-httplib2>=0.2.0
@@ -10,4 +10,8 @@ httpx>=0.28.1
 fastapi>=0.110.0
 uvicorn>=0.29.0
 requests>=2.32.3
-pytest>=7.4.0 
+pytest>=7.4.0
+openai>=1.3.0
+duckduckgo-search>=4.1.0
+beautifulsoup4>=4.12.0
+html2text>=2020.1.16 

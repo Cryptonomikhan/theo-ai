@@ -7,11 +7,21 @@ services:
       - "8000:8000"
     env_file:
       - .env
+    environment:
+      - API_SECRET_KEY=${API_SECRET_KEY}
+      - FORMATION_API_KEY=${FORMATION_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - DEFAULT_MODEL_PROVIDER=${DEFAULT_MODEL_PROVIDER}
+      - DEFAULT_MODEL_ID=${DEFAULT_MODEL_ID}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - GOOGLE_CALENDAR_CLIENT_ID=${GOOGLE_CALENDAR_CLIENT_ID}
+      - GOOGLE_CALENDAR_CLIENT_SECRET=${GOOGLE_CALENDAR_CLIENT_SECRET}
     command: python run_local.py
     volumes:
       - ./logs:/app/logs
+      - ./.env:/app/.env:ro
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/status"]
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -20,9 +30,19 @@ services:
     build: .
     env_file:
       - .env
-    command: python run_telegram_bot.py
+    environment:
+      - API_SECRET_KEY=${API_SECRET_KEY}
+      - FORMATION_API_KEY=${FORMATION_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - DEFAULT_MODEL_PROVIDER=${DEFAULT_MODEL_PROVIDER}
+      - DEFAULT_MODEL_ID=${DEFAULT_MODEL_ID}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - API_ENDPOINT=http://api:8000
+      - PYTHONPATH=/app
+    command: python run_theo_bot.py
     depends_on:
       api:
         condition: service_healthy
     volumes:
-      - ./logs:/app/logs 
+      - ./logs:/app/logs
+      - ./.env:/app/.env:ro 

@@ -4,6 +4,7 @@ Formation model implementation for the agno framework.
 This module provides support for Formation Cloud's model API.
 """
 import json
+import logging
 from collections.abc import AsyncIterator
 from dataclasses import asdict, dataclass
 from os import getenv
@@ -15,9 +16,9 @@ from agno.exceptions import ModelProviderError
 from agno.models.base import Model
 from agno.models.message import Message
 from agno.models.response import ModelResponse
-from agno.utils.log import get_logger, log_error, log_warning
 
-logger = get_logger(__name__)
+# Set up logging
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -92,7 +93,7 @@ class Formation(Model):
         """
         self.api_key = self.api_key or getenv("FORMATION_API_KEY")
         if not self.api_key:
-            log_error("FORMATION_API_KEY not set. Please set the FORMATION_API_KEY environment variable.")
+            logger.error("FORMATION_API_KEY not set. Please set the FORMATION_API_KEY environment variable.")
 
         self.base_url = self.base_url or getenv("FORMATION_API_BASE_URL", "https://agents.formation.cloud/v1")
 
@@ -270,13 +271,13 @@ class Formation(Model):
             response.raise_for_status()
             return response.json()
         except httpx.HTTPStatusError as e:
-            log_error(f"HTTP error invoking Formation model: {e}")
+            logger.error(f"HTTP error invoking Formation model: {e}")
             raise ModelProviderError(message=str(e), model_name=self.name, model_id=self.id) from e
         except httpx.TimeoutException as e:
-            log_error(f"Timeout invoking Formation model: {e}")
+            logger.error(f"Timeout invoking Formation model: {e}")
             raise ModelProviderError(message=str(e), model_name=self.name, model_id=self.id) from e
         except Exception as e:
-            log_error(f"Unexpected error invoking Formation model: {e}")
+            logger.error(f"Unexpected error invoking Formation model: {e}")
             raise ModelProviderError(message=str(e), model_name=self.name, model_id=self.id) from e
 
     async def ainvoke(self, messages: List[Message]) -> Dict[str, Any]:
@@ -305,13 +306,13 @@ class Formation(Model):
             response.raise_for_status()
             return response.json()
         except httpx.HTTPStatusError as e:
-            log_error(f"HTTP error invoking Formation model: {e}")
+            logger.error(f"HTTP error invoking Formation model: {e}")
             raise ModelProviderError(message=str(e), model_name=self.name, model_id=self.id) from e
         except httpx.TimeoutException as e:
-            log_error(f"Timeout invoking Formation model: {e}")
+            logger.error(f"Timeout invoking Formation model: {e}")
             raise ModelProviderError(message=str(e), model_name=self.name, model_id=self.id) from e
         except Exception as e:
-            log_error(f"Unexpected error invoking Formation model: {e}")
+            logger.error(f"Unexpected error invoking Formation model: {e}")
             raise ModelProviderError(message=str(e), model_name=self.name, model_id=self.id) from e
 
     def invoke_stream(self, messages: List[Message]) -> Iterator[Dict[str, Any]]:
@@ -351,15 +352,15 @@ class Formation(Model):
                             data = json.loads(data_str)
                             yield data
                         except json.JSONDecodeError:
-                            log_error(f"Error decoding Formation streaming response: {data_str}")
+                            logger.error(f"Error decoding Formation streaming response: {data_str}")
         except httpx.HTTPStatusError as e:
-            log_error(f"HTTP error invoking Formation model: {e}")
+            logger.error(f"HTTP error invoking Formation model: {e}")
             raise ModelProviderError(message=str(e), model_name=self.name, model_id=self.id) from e
         except httpx.TimeoutException as e:
-            log_error(f"Timeout invoking Formation model: {e}")
+            logger.error(f"Timeout invoking Formation model: {e}")
             raise ModelProviderError(message=str(e), model_name=self.name, model_id=self.id) from e
         except Exception as e:
-            log_error(f"Unexpected error invoking Formation model: {e}")
+            logger.error(f"Unexpected error invoking Formation model: {e}")
             raise ModelProviderError(message=str(e), model_name=self.name, model_id=self.id) from e
 
     async def ainvoke_stream(self, messages: List[Message]) -> AsyncIterator[Dict[str, Any]]:
@@ -399,15 +400,15 @@ class Formation(Model):
                             data = json.loads(data_str)
                             yield data
                         except json.JSONDecodeError:
-                            log_error(f"Error decoding Formation streaming response: {data_str}")
+                            logger.error(f"Error decoding Formation streaming response: {data_str}")
         except httpx.HTTPStatusError as e:
-            log_error(f"HTTP error invoking Formation model: {e}")
+            logger.error(f"HTTP error invoking Formation model: {e}")
             raise ModelProviderError(message=str(e), model_name=self.name, model_id=self.id) from e
         except httpx.TimeoutException as e:
-            log_error(f"Timeout invoking Formation model: {e}")
+            logger.error(f"Timeout invoking Formation model: {e}")
             raise ModelProviderError(message=str(e), model_name=self.name, model_id=self.id) from e
         except Exception as e:
-            log_error(f"Unexpected error invoking Formation model: {e}")
+            logger.error(f"Unexpected error invoking Formation model: {e}")
             raise ModelProviderError(message=str(e), model_name=self.name, model_id=self.id) from e
 
     @staticmethod

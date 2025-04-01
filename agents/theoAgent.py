@@ -9,14 +9,14 @@ from typing import List, Dict, Any, Optional
 import os
 import logging
 
-from agno.agent import Agent
+from agno.agent import Agent, RunResponse
 from agno.models.openai import OpenAIChat
 from agno.tools.duckduckgo import DuckDuckGoTools
-from agno.tools.langchain import WebBrowserTools
+from agno.tools.website import WebsiteTools
 from agno.tools.googlecalendar import GoogleCalendarTools
 from agno.tools.telegram import TelegramTools
 
-from models.formation import Formation, FormationChat
+from models.formation import Formation
 from utils.config import (
     OPENAI_API_KEY, 
     FORMATION_API_KEY,
@@ -83,7 +83,7 @@ class TheoAgent:
             # Set up tools
             tools = [
                 DuckDuckGoTools(),  # Web search
-                WebBrowserTools(),   # Web browser/scraping
+                WebsiteTools(),     # Website content extraction and analysis
             ]
             
             # Add Google Calendar Tools using Agno's native implementation
@@ -117,22 +117,20 @@ class TheoAgent:
                 tools=tools,
                 markdown=True,
                 show_tool_calls=True,
+                description="""
+                You are Theo-AI, a professional business development research assistant.
+                You help identify partnership opportunities and business synergies by researching 
+                companies and individuals mentioned in conversations.
+                
+                Always maintain a professional, courteous, and focused tone suitable for business development.
+                """,
                 instructions=[
-                    """
-                    You are Theo-AI, a professional business development research assistant.
-                    You help identify partnership opportunities and business synergies by researching 
-                    companies and individuals mentioned in conversations.
-                    
-                    Always maintain a professional, courteous, and focused tone suitable for business development.
-                    
-                    When you need information, use your web search and web browser tools to gather data about:
-                    - Company backgrounds, products, and funding rounds
-                    - Key personnel and their professional backgrounds
-                    - Potential synergies and partnership opportunities
-                    
-                    If calendar scheduling is mentioned, help schedule calls using the Google Calendar integration.
-                    When sending messages to the Telegram chat, use the Telegram tools directly.
-                    """
+                    "When you need information, use your research tools to gather data about company backgrounds, products, and funding rounds",
+                    "Research key personnel and their professional backgrounds",
+                    "Identify potential synergies and partnership opportunities",
+                    "First use DuckDuckGo to search for relevant information, then use the Website tools to extract detailed information",
+                    "If calendar scheduling is mentioned, help schedule calls using the Google Calendar integration",
+                    "When sending messages to the Telegram chat, use the Telegram tools directly"
                 ]
             )
             
@@ -156,11 +154,17 @@ class TheoAgent:
             # Format the chat context for the agent
             formatted_context = self._format_chat_context(chat_context)
             
-            # Get agent's response
-            response = self.agent.get_response(
-                formatted_context,
-                system_prompt=system_prompt
-            )
+            # Create a new agent with custom system message if needed
+            if system_prompt:
+                # Temporarily override the system message if needed
+                self.agent.system_message = system_prompt
+            
+            # Get agent's response using the run method
+            # This is the standard way to use Agno agents as shown in the documentation and examples
+            run_response: RunResponse = self.agent.run(formatted_context)
+            
+            # Extract the content from the RunResponse
+            response = run_response.content if hasattr(run_response, 'content') else str(run_response)
             
             logger.info(f"Agent response generated successfully")
             return response
